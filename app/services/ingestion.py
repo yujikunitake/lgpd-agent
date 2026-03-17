@@ -4,7 +4,14 @@ from app.schemas.ingestion import DocumentChunk
 
 
 class IngestionService:
+    """Service responsible for loading and chunking markdown documents."""
+
     def __init__(self):
+        """Initializes the service and configures the markdown text splitter.
+
+        The splitter is configured to track specific markdown headers so that
+        hierarchical context is preserved in the resulting chunks.
+        """
         # We define which Markdown headers we care about for the LLM context.
         # This preserves Chapter and Article hierarchies.
         self.headers_to_split_on = [
