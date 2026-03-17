@@ -1,10 +1,46 @@
-# Python-generated files
+# Python
 __pycache__/
-*.py[oc]
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
 build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
 wheels/
-*.egg-info
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Virtual environments
-.venv
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Ferramentas (uv, ruff, pytest)
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Variáveis de Ambiente (CRÍTICO)
+.env
+.env.*
+!.env.example
+
+# Sistema (macOS)
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
