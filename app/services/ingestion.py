@@ -18,11 +18,8 @@ class IngestionService:
         )
 
     def chunk_markdown(self, markdown_text: str) -> list[DocumentChunk]:
-        # Langchain does the heavy lifting of parsing markdown
-        langchain_docs = self.markdown_splitter.split_text(markdown_text)
-
-        chunks = []
-        for doc in langchain_docs:
-            chunks.append(DocumentChunk(content=doc.page_content, metadata=doc.metadata))
-
-        return chunks
+        """Splits markdown text into DocumentChunks preserving header metadata."""
+        return [
+            DocumentChunk(content=doc.page_content, metadata=doc.metadata)
+            for doc in self.markdown_splitter.split_text(markdown_text)
+        ]
