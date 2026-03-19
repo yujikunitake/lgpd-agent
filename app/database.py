@@ -15,7 +15,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def init_db():
+def init_db() -> None:
     """Initializes the database by enabling necessary extensions.
 
     This function ensures that the 'pgvector' extension is enabled in the
