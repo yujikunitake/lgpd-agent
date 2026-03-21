@@ -9,7 +9,7 @@ class DocumentChunk(Base):
 
     __tablename__ = "document_chunks"
 
-    id = Column(Integer, primary_key=True, autouse=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     content = Column(String, nullable=False)
     metadata_ = Column(JSON, nullable=False)
     embedding = Column(Vector(384), nullable=False)
