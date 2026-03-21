@@ -29,3 +29,18 @@ class RAGProtocol(Protocol):
             list[str]: A list of relevant text chunks retrieved from the knowledge base.
         """
         ...
+
+
+class EmbeddingsProtocol(Protocol):
+    """Protocol defining the interface for an embeddings generator."""
+
+    def get_embedding(self, text: str) -> list[float]:
+        """Generates a high-dimensional vector embedding for the given text.
+
+        Args:
+            text (str): The input text to be vectorized.
+
+        Returns:
+            list[float]: A list of floats representing the text embedding.
+        """
+        ...
