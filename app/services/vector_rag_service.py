@@ -1,15 +1,17 @@
-from app.interfaces.qa_interfaces import RAGProtocol
+from app.interfaces.qa_interfaces import EmbeddingsProtocol, RAGProtocol
 from app.services.vector_store import VectorStoreService
 
 
 class VectorRAGService(RAGProtocol):
     """Implementation of RAG that uses vector search in PostgreSQL."""
 
-    def __init__(self, embeddings_service, vector_store_service: VectorStoreService):
+    def __init__(
+        self, embeddings_service: EmbeddingsProtocol, vector_store_service: VectorStoreService
+    ):
         """Initializes the VectorRAGService.
 
         Args:
-            embeddings_service: Service to generate embeddings from text.
+            embeddings_service (EmbeddingsProtocol): Service to generate embeddings from text.
             vector_store_service (VectorStoreService): Service to handle vector search.
         """
         self._embeddings_service = embeddings_service
