@@ -45,7 +45,9 @@ select = [
     "SIM",  # flake8-simplify
     "S",    # flake8-strict
 ]
-ignore = []
+ignore = [
+    "B008", # Do not perform function call `Depends` in argument defaults (standard FastAPI pattern)
+]
 fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
