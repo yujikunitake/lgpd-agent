@@ -1,5 +1,4 @@
 import pytest
-from app.services.vector_store import VectorStoreService
 
 from app.database import Base, engine
 
@@ -11,15 +10,13 @@ def setup_db():
     Base.metadata.drop_all(bind=engine)
 
 
-def test_search_similar_chunks(fake):
-    store = VectorStoreService(engine)
-
+def test_search_similar_chunks(fake, vector_store_service):
     content = "Artigo 1: Esta Lei dispõe sobre a proteção de dados pessoais."
-    embedding = [fake.pyfloat()] * 384
+    embedding = fake.vector(dims=384)
     metadata = {"source": "artigo_1.txt"}
 
-    store.add_chunk(content, embedding, metadata)
-    results = store.search(embedding, top_k=1)
+    vector_store_service.add_chunk(content, embedding, metadata)
+    results = vector_store_service.search(embedding, top_k=1)
 
     assert len(results) == 1
     assert results[0]["content"] == content
