@@ -1,3 +1,4 @@
+from app.database import engine
 from app.services.agent import Agent
 from app.services.embeddings import EmbeddingsService
 from app.services.qa_service import QAService
@@ -5,7 +6,7 @@ from app.services.vector_rag_service import VectorRAGService
 from app.services.vector_store import VectorStoreService
 
 embeddings_service = EmbeddingsService()
-vector_store_service = VectorStoreService()
+vector_store_service = VectorStoreService(engine)
 vector_rag_service = VectorRAGService(embeddings_service, vector_store_service)
 
 
