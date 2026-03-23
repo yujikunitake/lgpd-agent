@@ -1,8 +1,6 @@
 import os
 import sys
 
-sys.path.append(os.getcwd())
-
 from app.database import engine, init_db
 from app.services.embeddings import EmbeddingsService
 from app.services.ingestion import IngestionService

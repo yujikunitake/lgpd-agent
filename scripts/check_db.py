@@ -1,9 +1,4 @@
 import json
-import os
-import sys
-
-# Add the project root to sys.path
-sys.path.append(os.getcwd())
 
 from sqlalchemy import text
 
