@@ -1,15 +1,3 @@
-import pytest
-
-from app.database import Base, engine
-
-
-@pytest.fixture(autouse=True)
-def setup_db():
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
-
-
 def test_search_similar_chunks(fake, vector_store_service):
     content = "Artigo 1: Esta Lei dispõe sobre a proteção de dados pessoais."
     embedding = fake.vector(dims=384)

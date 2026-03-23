@@ -16,11 +16,13 @@ Base = declarative_base()
 
 
 def init_db() -> None:
-    """Initializes the database by enabling necessary extensions.
+    """Initializes the database by enabling necessary extensions and creating tables.
 
-    This function ensures that the 'pgvector' extension is enabled in the
-    Postgres database so that vector operations can be performed.
+    This function ensures that the 'pgvector' extension is enabled and that
+    all defined models (like DocumentChunk) have their tables created.
     """
     with engine.connect() as conn:
         conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
         conn.commit()
+
+    Base.metadata.create_all(bind=engine)

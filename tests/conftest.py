@@ -2,8 +2,18 @@ import pytest
 from faker import Faker
 from faker.providers import BaseProvider
 
-from app.database import engine
+from app.database import Base, engine
+from app.services.embeddings import EmbeddingsService
+from app.services.ingestion import IngestionService
 from app.services.vector_store import VectorStoreService
+
+
+@pytest.fixture(autouse=True)
+def setup_db():
+
+    Base.metadata.create_all(bind=engine)
+    yield
+    Base.metadata.drop_all(bind=engine)
 
 
 class VectorProvider(BaseProvider):
@@ -27,3 +37,15 @@ def fake():
 def vector_store_service():
     """Global fixture to provide a VectorStoreService instance to all tests."""
     return VectorStoreService(engine)
+
+
+@pytest.fixture(scope="session")
+def embeddings_service():
+    """Global fixture to provide an EmbeddingsService instance to all tests."""
+    return EmbeddingsService()
+
+
+@pytest.fixture(scope="session")
+def ingestion_service(embeddings_service, vector_store_service):
+    """Global fixture to provide an IngestionService instance to all tests."""
+    return IngestionService(embeddings_service, vector_store_service)
