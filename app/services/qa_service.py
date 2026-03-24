@@ -1,39 +1,81 @@
 from app.interfaces.qa_interfaces import LLMProtocol, RAGProtocol
-from app.schemas.agent import AgentStrategy
-from app.schemas.qa import QAResponse
+from app.schemas.qa import QAResponse, Source
 from app.services.agent import Agent
 
 
 class QAService:
-    """Service responsible for orchestrating the Question Answering flow."""
+    """Service to orchestrate the QA process using Agent decision and RAG."""
 
-    def __init__(self, llm: LLMProtocol, rag: RAGProtocol, agent: Agent):
-        """Initializes the QAService with its necessary dependencies.
+    def __init__(
+        self,
+        llm_service: LLMProtocol,
+        rag_service: RAGProtocol,
+        agent: Agent,
+    ):
+        """Initializes the QAService.
 
         Args:
-            llm (LLMProtocol): The language model text generator.
-            rag (RAGProtocol): The document retriever for the knowledge base.
-            agent (Agent): The agent responsible for strategy routing.
+            llm_service (LLMProtocol): Service to generate answers.
+            rag_service (RAGProtocol): Service to retrieve context.
+            agent (Agent): Service to decide strategy.
         """
-        self.llm = llm
-        self.rag = rag
+        self.llm_service = llm_service
+        self.rag_service = rag_service
         self.agent = agent
 
     def ask(self, question: str) -> QAResponse:
-        """Processes a user question, potentially consulting RAG, and generates an answer.
+        """Processes a question and returns a structured response.
 
         Args:
-            question (str): The user's input question.
+            question (str): The user's question.
 
         Returns:
-            QAResponse: The structured response containing the answer and its sources.
+            QAResponse: The generated answer and metadata.
         """
+        # 1. Decide strategy
         strategy = self.agent.decide(question)
 
-        sources: list[str] = []
-        if strategy == AgentStrategy.RAG:
-            sources = self.rag.retrieve(question)
+        # 2. Handle DIRECT strategy
+        if strategy.value == "DIRECT":
+            prompt = f"Responda à seguinte pergunta sobre LGPD de forma direta: {question}"
+            answer = self.llm_service.generate(prompt)
+            return QAResponse(answer=answer, strategy=strategy, sources=[])
 
-        answer = self.llm.generate(prompt=question)
+        # 3. Handle RAG strategy
+        # Retrieve context
+        context_chunks = self.rag_service.retrieve(question)
 
-        return QAResponse(answer=answer, sources=sources)
+        if not context_chunks:
+            return QAResponse(
+                answer="Sinto muito, não encontrei informações específicas sobre isso na LGPD.",
+                strategy=strategy,
+                sources=[],
+            )
+
+        # Format context for prompt
+        context_str = "\n\n".join([f"- {c}" for c in context_chunks])
+
+        # Build Prompt
+        prompt = f"""Você é um assistente especialista na Lei Geral de Proteção de Dados
+            (LGPD) do Brasil.
+            Use o contexto fornecido abaixo para responder à pergunta do usuário de forma
+            precisa e profissional.
+            Se a resposta não estiver no contexto, use seu conhecimento geral
+            para complementar, mas priorize o contexto.
+
+            Contexto:
+            {context_str}
+
+            Pergunta: {question}
+
+            Resposta:
+        """
+
+        # Generate answer
+        answer = self.llm_service.generate(prompt)
+
+        # For now, sources are just the strings retrieved.
+        # In the future we can extract more metadata.
+        sources = [Source(content=c[:100] + "...", location="LGPD") for c in context_chunks]
+
+        return QAResponse(answer=answer, strategy=strategy, sources=sources)
