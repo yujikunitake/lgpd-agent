@@ -24,6 +24,15 @@ def mock_agent():
 
 
 @pytest.fixture
+def mock_llm():
+    from unittest.mock import MagicMock
+
+    llm = MagicMock()
+    llm.generate.return_value = "De acordo com a LGPD, o tratamento deve ser ético."
+    return llm
+
+
+@pytest.fixture
 def qa_service(mock_llm, mock_rag, mock_agent):
     return QAService(mock_llm, mock_rag, mock_agent)
 

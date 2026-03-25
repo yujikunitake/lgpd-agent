@@ -32,12 +32,23 @@ class QAService:
         Returns:
             QAResponse: The generated answer and metadata.
         """
-        # 1. Decide strategy
+        # 1. Decide strategy (covers GREETING, RAG, DIRECT)
         strategy = self.agent.decide(question)
 
-        # 2. Handle DIRECT strategy
-        if strategy.value == "DIRECT":
-            prompt = f"Responda à seguinte pergunta sobre LGPD de forma direta: {question}"
+        # 2. Handle GREETING strategy
+        from app.schemas.agent import AgentStrategy
+
+        if strategy == AgentStrategy.GREETING:
+            return QAResponse(
+                answer="Olá! Eu sou o assistente LGPD. Posso te ajudar com dúvidas sobre a\
+                    Lei Geral de Proteção de Dados. O que você gostaria de saber?",
+                strategy=strategy,
+                sources=[],
+            )
+
+        # 3. Handle DIRECT strategy
+        if strategy == AgentStrategy.DIRECT:
+            prompt = f"Pergunta: {question}\nResposta breve em Português:"
             answer = self.llm_service.generate(prompt)
             return QAResponse(answer=answer, strategy=strategy, sources=[])
 
@@ -47,29 +58,22 @@ class QAService:
 
         if not context_chunks:
             return QAResponse(
-                answer="Sinto muito, não encontrei informações específicas sobre isso na LGPD.",
+                answer="Desculpe, não encontrei informações sobre isso na LGPD.",
                 strategy=strategy,
                 sources=[],
             )
 
         # Format context for prompt
-        context_str = "\n\n".join([f"- {c}" for c in context_chunks])
+        context_str = "\n".join([f"- {c}" for c in context_chunks])
 
-        # Build Prompt
-        prompt = f"""Você é um assistente especialista na Lei Geral de Proteção de Dados
-            (LGPD) do Brasil.
-            Use o contexto fornecido abaixo para responder à pergunta do usuário de forma
-            precisa e profissional.
-            Se a resposta não estiver no contexto, use seu conhecimento geral
-            para complementar, mas priorize o contexto.
+        # Build Prompt (Simplified for 1B model)
+        prompt = f"""Use o contexto da LGPD para responder em Português. Seja breve.
 
-            Contexto:
-            {context_str}
+        Contexto:
+        {context_str}
 
-            Pergunta: {question}
-
-            Resposta:
-        """
+        Pergunta: {question}
+        Resposta:"""
 
         # Generate answer
         answer = self.llm_service.generate(prompt)

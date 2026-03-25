@@ -8,7 +8,7 @@ class LLMService(LLMProtocol):
 
     def __init__(
         self,
-        model: str = "phi3:mini",
+        model: str = "llama3.2:1b",
         api_key: str | None = None,
         base_url: str = "http://localhost:11434/v1/chat/completions",
     ):
@@ -45,7 +45,7 @@ class LLMService(LLMProtocol):
 
         try:
             with httpx.Client() as client:
-                response = client.post(self.base_url, headers=headers, json=data, timeout=60.0)
+                response = client.post(self.base_url, headers=headers, json=data, timeout=180.0)
 
             if response.status_code != 200:
                 raise Exception(f"LLM generation failed: {response.status_code} - {response.text}")

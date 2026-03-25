@@ -6,3 +6,4 @@ class AgentStrategy(StrEnum):
 
     RAG = "use_rag"
     DIRECT = "direct"
+    GREETING = "greeting"
